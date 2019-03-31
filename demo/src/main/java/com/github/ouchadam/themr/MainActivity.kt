@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
   private fun bind(attributes: ThemeAttributes) {
     bind(colorOne, attributes.colorPrimary)
     bind(colorTwo, attributes.colorAccent)
-    bind(colorThree, attributes.backgroundInverse)
+    bind(colorThree, attributes.inverseForeground)
   }
 
   @SuppressLint("SetTextI18n")
@@ -47,7 +47,7 @@ private fun Activity.themr(paletteId: Int, themeId: Int): Int {
 data class ThemeAttributes(
     @Attr.Id(R.attr.colorPrimary) @ColorInt val colorPrimary: Int,
     @Attr.Id(R.attr.colorAccent) @ColorInt val colorAccent: Int,
-    @Attr.Id(R.attr.brandBackgroundColorInverse) @ColorInt val backgroundInverse: Int
+    @Attr.Id(android.R.attr.colorForegroundInverse) @ColorInt val inverseForeground: Int
 )
 
 private fun TextView.addLeftSquare(color: Int) {

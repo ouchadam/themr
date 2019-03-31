@@ -27,6 +27,7 @@
     <item name="colorPrimaryDark">?attr/brandColor</item>
     <item name="colorAccent">?attr/brandColorAccent</item>
     <item name="android:windowBackground">?attr/brandBackgroundColor</item>
+    <item name="android:colorForegroundInverse">?attr/brandBackgroundColorInverse</item>
   </style>
 
 </resources>

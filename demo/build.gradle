@@ -1,17 +1,17 @@
-buildscript {
-  repositories {
-    flatDir dirs: "../themr/build/libs"
-  }
-  dependencies {
-    classpath "com.github.ouchadam.themr:themr"
-  }
-}
+//buildscript {
+//  repositories {
+//    flatDir dirs: "../themr/build/libs"
+//  }
+//  dependencies {
+//    classpath "com.github.ouchadam.themr:themr"
+//  }
+//}
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.github.ouchadam.themr'
+//apply plugin: 'com.github.ouchadam.themr'
 
 android {
   compileSdkVersion 28
@@ -33,7 +33,7 @@ dependencies {
   implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 }
 
-themr {
-  combinations = ["AppTheme": ["PaletteA", "PaletteB"]]
-}
+//themr {
+//  combinations = ["AppTheme": ["PaletteA", "PaletteB"]]
+//}
 

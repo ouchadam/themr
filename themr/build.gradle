@@ -17,6 +17,6 @@ publish {
   groupId = 'com.github.ouchadam'
   artifactId = 'themr'
   publishVersion = "$System.env.CIRCLE_BUILD_NUM"
-  desc = 'Theme concatination via gradle plugin'
+  desc = 'Theme concatenation via gradle plugin'
   website = 'https://github.com/ouchadam/themr'
 }

@@ -4,11 +4,15 @@ Theme concatenation via gradle plugin
 
 ```gradle
 buildscript {
+  repositories {
+    jcenter()
+  }
   dependencies {
-    classpath "com.github.ouchadam.themr:<latest version>"
+    classpath "com.github.ouchadam.themr:<latest-version>"
   }
 }
 
+apply plugin: 'com.android.application'
 apply plugin: 'com.github.ouchadam.themr'
 
 ```

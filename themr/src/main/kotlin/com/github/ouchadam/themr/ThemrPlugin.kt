@@ -7,7 +7,6 @@ import java.io.File
 
 class ThemrPlugin : Plugin<Project> {
   override fun apply(project: Project) {
-
     val extension = project.extensions.create("themr", ThemrPluginExtension::class.java)
 
     project.plugins.withType(AppPlugin::class.java) { plugin ->
@@ -16,12 +15,14 @@ class ThemrPlugin : Plugin<Project> {
       }
     }
 
-    project.afterEvaluate {
-      project.task("themrGenerateThemes") {
+    project.task("themrGenerateThemes") {
+      it.doLast {
         val styles: Map<String, Style> = readThemeStyles(project.file("src/main/res/values/${extension.source}.xml"))
         val output = createThemeCombinations(styles, extension.combinations)
         writeGeneratedStyles(project, createOutputStyles(output))
       }
+    }
+    project.afterEvaluate {
       project.tasks.getByName("preBuild").dependsOn("themrGenerateThemes")
     }
   }

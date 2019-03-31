@@ -1,0 +1,22 @@
+apply plugin: 'kotlin'
+apply plugin: 'com.novoda.bintray-release'
+
+repositories {
+  google()
+  jcenter()
+}
+
+dependencies {
+  implementation gradleApi()
+  implementation "com.android.tools.build:gradle:3.3.2"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+publish {
+  userOrg = 'ouchadam'
+  groupId = 'com.github.ouchadam'
+  artifactId = 'themr'
+  publishVersion = "$System.env.CIRCLE_BUILD_NUM"
+  desc = 'Theme concatination via gradle plugin'
+  website = 'https://github.com/ouchadam/themr'
+}

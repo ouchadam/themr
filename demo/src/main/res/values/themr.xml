@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <declare-styleable name="Palette">
+    <attr format="color|reference" name="brandColor"/>
+    <attr format="color|reference" name="brandColorAccent"/>
+    <attr format="color|reference" name="brandBackgroundColor"/>
+    <attr format="color|reference" name="brandBackgroundColorInverse"/>
+  </declare-styleable>
+
+  <style name="PaletteA">
+    <item name="brandColor">#008577</item>
+    <item name="brandColorAccent">#D81B60</item>
+    <item name="brandBackgroundColor">@android:color/white</item>
+    <item name="brandBackgroundColorInverse">@android:color/black</item>
+  </style>
+
+  <style name="PaletteB">
+    <item name="brandColor">@android:color/holo_orange_dark</item>
+    <item name="brandColorAccent">@android:color/holo_blue_bright</item>
+    <item name="brandBackgroundColor">@android:color/black</item>
+    <item name="brandBackgroundColorInverse">@android:color/white</item>
+  </style>
+
+  <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <item name="colorPrimary">?attr/brandColor</item>
+    <item name="colorPrimaryDark">?attr/brandColor</item>
+    <item name="colorAccent">?attr/brandColorAccent</item>
+    <item name="android:windowBackground">?attr/brandBackgroundColor</item>
+  </style>
+
+</resources>

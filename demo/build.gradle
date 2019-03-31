@@ -1,0 +1,39 @@
+buildscript {
+  repositories {
+    flatDir dirs: "../themr/build/libs"
+  }
+  dependencies {
+    classpath "com.github.ouchadam.themr:themr"
+  }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.github.ouchadam.themr'
+
+android {
+  compileSdkVersion 28
+  defaultConfig {
+    applicationId "com.github.ouchadam.themr"
+    minSdkVersion 21
+    targetSdkVersion 28
+    versionCode 1
+    versionName "1.0"
+  }
+}
+
+dependencies {
+  compileOnly 'com.github.ouchadam:attr:12'
+  kapt 'com.github.ouchadam:attr-processor:12'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation 'androidx.appcompat:appcompat:1.1.0-alpha02'
+  implementation 'androidx.core:core-ktx:1.1.0-alpha04'
+  implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+}
+
+themr {
+  combinations = ["AppTheme": ["PaletteA", "PaletteB"]]
+}
+

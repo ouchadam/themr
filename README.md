@@ -115,7 +115,7 @@ fun bindView(view) {
 `themr` reduces the need for this boiler plate by allowing the palettes and themes to be decoupled and the combinations auto generated.
 
 
-Combintations are declared as part of the plugin extension
+Combinations are declared as part of the plugin extension
 ```groovy
 themr {
   combinations = [

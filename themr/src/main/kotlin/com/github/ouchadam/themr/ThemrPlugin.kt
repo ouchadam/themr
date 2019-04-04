@@ -3,7 +3,9 @@ package com.github.ouchadam.themr
 import com.android.build.gradle.AppPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.w3c.dom.Element
 import java.io.File
+import javax.xml.parsers.DocumentBuilderFactory
 
 class ThemrPlugin : Plugin<Project> {
   override fun apply(project: Project) {
@@ -40,7 +42,7 @@ class ThemrPlugin : Plugin<Project> {
         val paletteStyle = styles.getValue(paletteName)
         Style(
             name = "${paletteStyle.name}_${themeStyle.name}",
-            content = paletteStyle.content.plus(themeStyle.content),
+            items = paletteStyle.items.plus(themeStyle.items),
             parent = themeStyle.parent
         )
       }
@@ -50,27 +52,40 @@ class ThemrPlugin : Plugin<Project> {
   private fun createOutputStyles(outputStyles: List<Style>): String {
     return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
         "<resources>\n" + outputStyles.map {
-      "<style name=\"${it.name}\" ${it.parent?.let { "parent=\"$it\"" }}>\n${it.content}\n</style>"
+      "<style name=\"${it.name}\" ${it.parent?.let { "parent=\"$it\"" }}>\n\t${it.items.joinToString("\n\t") {
+        "<item name=\"${it.name}\">${it.value}</item>"
+      }}\n</style>"
     }.joinToString("\n") + "\n</resources>"
   }
 
   private fun readThemeStyles(file: File): Map<String, Style> {
-    val inputAsString = file.readText()
-    val toRegex = "<style(.|\\n)+?</style>(.|\\n)".toRegex(RegexOption.DOT_MATCHES_ALL)
-    return toRegex.findAll(inputAsString).map { toStyle(it.value) }
-        .associate { it.name to it }
+    val xmlDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
+    xmlDoc.documentElement.normalize()
+    val styles = xmlDoc.getElementsByTagName("style")
+    return styles?.let {
+      val stylesMap = mutableMapOf<String, Style>()
+      for (i in 0 until it.length) {
+        val style = it.item(i)
+        val name = style.attributes.getNamedItem("name").nodeValue
+        val parent = style.attributes.getNamedItem("parent")?.nodeValue
+        val items = (style as Element).getElementsByTagName("item")?.let { itemNodes ->
+          val items = mutableListOf<Item>()
+          for (itemIndex in 0 until itemNodes.length) {
+            val itemNode = itemNodes.item(itemIndex)
+            val itemName = itemNode.attributes.getNamedItem("name")
+            items.add(Item(itemName.nodeName, itemNode.textContent))
+          }
+          items
+        } ?: emptyList<Item>()
+        stylesMap[name] = Style(name, items, parent)
+      }
+      stylesMap
+    } ?: emptyMap()
   }
-
-  private fun toStyle(rawStyle: String): Style {
-    val styleName = "style name=\"(.+?)\"".toRegex().find(rawStyle)!!.groupValues[1].trim()
-    val parentName = "parent=\"(.+)\"".toRegex().find(rawStyle)?.groupValues?.get(1)?.trim()
-    val content = "<style .+?>((.|\\n)+?)</style>(.|\\n)".toRegex().find(rawStyle)!!.groupValues[1].trim()
-    return Style(styleName, content, parentName)
-  }
-
 }
 
-internal data class Style(val name: String, val content: String, val parent: String?)
+internal data class Style(val name: String, val items: List<Item>, val parent: String?)
+internal data class Item(val name: String, val value: String)
 
 open class ThemrPluginExtension {
   var source: String = "themr"

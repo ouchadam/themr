@@ -73,7 +73,7 @@ class ThemrPlugin : Plugin<Project> {
           for (itemIndex in 0 until itemNodes.length) {
             val itemNode = itemNodes.item(itemIndex)
             val itemName = itemNode.attributes.getNamedItem("name")
-            items.add(Item(itemName.nodeName, itemNode.textContent))
+            items.add(Item(itemName.nodeValue, itemNode.textContent))
           }
           items
         } ?: emptyList<Item>()

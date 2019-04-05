@@ -73,5 +73,90 @@ The example above will generate
 </style>
 ```
 
+### Why is this useful?
 
 
+When an app uses mulitple themes 
+
+```xml
+<style name="HomeTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="colorPrimary">@color/blue</item>
+    <item name="android:textColor">@color/black</item>
+</style>
+
+<style name="DetailsTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="colorPrimary">@color/red</item>
+    <item name="android:textColor">@color/white</item>
+</style>
+```
+
+and different palettes are required such as a dark mode, management starts to get tricky, especially when more palettes are introduced. This can be achieved by copying all of the themes for each palette, rearchitecting the theme hierarchy or by programatically applying the colours. 
+
+
+```xml
+<style name="HomeTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="colorPrimary">@color/blue</item>
+    <item name="android:textColor">@color/black</item>
+</style>
+
+<style name="DarkHomeTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="colorPrimary">@color/dark_blue</item>
+    <item name="android:textColor">@color/grey</item>
+</style>
+```
+
+```kotlin
+fun bindView(view) {
+  val themeWrapper = createThemeWrapperFor(Configuration.DARK_MODE) // find all the dark mode attributes
+  view.text.setTextColor(themeWrapper.colorPrimary)
+}
+```
+
+`themr` reduces the need for this boiler plate by allowing the palettes and themes to be decoupled and the combinations auto generated.
+
+
+Combinations are declared as part of the plugin extension
+```groovy
+themr {
+  combinations = [
+    "HomeTheme": ["LightMode", "DarkMode"],
+    "DetailsTheme": ["LightMode", "DarkMode"]
+  ]
+}
+```
+
+```xml
+<style name="LightMode">
+    <item name="brandColor">@color/blue</item>
+    <item name="brandColorSecondary">@color/red</item>
+    <item name="brandTextColor">@color/black</item>
+    <item name="brandTextColorInverse">@color/white</item>
+</style>
+
+<style name="DarkMode">
+    <item name="brandColor">@color/dark_blue</item>
+    <item name="brandColorSecondary">@color/blue</item>
+    <item name="brandTextColor">@color/grey</item>
+    <item name="brandTextColorInverse">@color/black</item>
+</style>
+
+<style name="HomeTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="colorPrimary">?attr/brandColor</item>
+    <item name="android:textColor">?attr/brandTextColor</item>
+</style>
+
+<style name="DetailsTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="colorPrimary">?attr/brandColorSecondary</item>
+    <item name="android:textColor">?attr/brandTextColorInverse</item>
+</style>
+```
+
+`themr` will generate styles to `buildDir/generated/res/themer` which the app can then consume via id or by `resources.getIdentifier`
+
+```
+{Palette}_{Theme}
+LightMode_HomeTheme
+DarkMode_HomeTheme
+LightMode_DetailsTheme
+DarkMode_DetailsTheme
+```

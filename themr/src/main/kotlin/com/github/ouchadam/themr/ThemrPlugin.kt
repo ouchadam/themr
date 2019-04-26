@@ -1,6 +1,7 @@
 package com.github.ouchadam.themr
 
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.w3c.dom.Element
@@ -12,6 +13,12 @@ class ThemrPlugin : Plugin<Project> {
     val extension = project.extensions.create("themr", ThemrPluginExtension::class.java)
 
     project.plugins.withType(AppPlugin::class.java) { plugin ->
+      plugin.extension.sourceSets {
+        it.getByName("main").res.srcDirs(project.file("build/generated/res/themr"))
+      }
+    }
+
+    project.plugins.withType(LibraryPlugin::class.java) { plugin ->
       plugin.extension.sourceSets {
         it.getByName("main").res.srcDirs(project.file("build/generated/res/themr"))
       }

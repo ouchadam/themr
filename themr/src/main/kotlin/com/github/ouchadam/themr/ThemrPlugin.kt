@@ -75,8 +75,20 @@ class ThemrPlugin : Plugin<Project> {
   }
 
   private fun readPackageName(project: Project): String {
-    return project.plugins.findPlugin(AppPlugin::class.java)?.extension?.defaultConfig?.applicationId ?: project.plugins.findPlugin(
-        LibraryPlugin::class.java)?.extension?.defaultConfig?.applicationId ?: throw IllegalStateException("The project doesn't apply an android plugin!")
+    return project.plugins.findPlugin(AppPlugin::class.java)?.extension?.defaultConfig?.applicationId
+        ?: findPackageNameFromManifest(project)
+        ?: throw IllegalStateException("The project doesn't apply an android plugin!")
+  }
+
+  private fun findPackageNameFromManifest(project: Project): String? {
+    val manifest = project.file("src/main/AndroidManifest.xml")
+    val xmlDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(manifest)
+    xmlDoc.documentElement.normalize()
+    return try {
+      xmlDoc.getElementsByTagName("manifest").item(0).attributes.getNamedItem("package").nodeValue
+    } catch (e: Exception) {
+      null
+    }
   }
 }
 

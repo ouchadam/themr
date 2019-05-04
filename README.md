@@ -43,15 +43,9 @@ themr {
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
-  setTheme(themr(R.style.PaletteDark, R.style.AppTheme))
+  setTheme(ThemR.get(R.style.PaletteDark, R.style.AppTheme))
   super.onCreate(savedInstanceState)
   setContentView(R.layout.activity_main)
-}
-
-private fun Activity.themr(paletteId: Int, themeId: Int): Int {
-  val paletteStyle = this.resources.getResourceName(paletteId).split("/")[1]
-  val themeStyle = this.resources.getResourceName(themeId).split("/")[1]
-  return this.resources.getIdentifier(paletteStyle + "_" + themeStyle, "style", this.packageName)
 }
 ```
 
@@ -151,7 +145,8 @@ themr {
 </style>
 ```
 
-`themr` will generate styles to `buildDir/generated/res/themer` which the app can then consume via id or by `resources.getIdentifier`
+`themr` will generate styles to `buildDir/generated/res/themr` which the app can then consume via id, a `resources.getIdentifier` lookup
+or via generated helper `ThemR.get(paletteId, themeId)`
 
 ```
 {Palette}_{Theme}

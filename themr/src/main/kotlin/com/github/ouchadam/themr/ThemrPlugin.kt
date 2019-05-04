@@ -26,7 +26,12 @@ class ThemrPlugin : Plugin<Project> {
 
     project.task("themrGenerateThemes") {
       it.doLast {
-        val styles: Map<String, Style> = readThemeStyles(project.file("src/main/res/values/${extension.source}.xml"))
+        val styles = extension.source.map { fileName ->
+          readThemeStyles(project.file("src/main/res/values/$fileName.xml"))
+        }.foldRight(mutableMapOf<String, Style>()) { current, acc ->
+          acc.putAll(current); acc
+        }
+
         val output = createThemeCombinations(styles, extension.combinations)
         writeGeneratedStyles(project, createOutputStyles(output))
       }
@@ -95,6 +100,6 @@ internal data class Style(val name: String, val items: List<Item>, val parent: S
 internal data class Item(val name: String, val value: String)
 
 open class ThemrPluginExtension {
-  var source: String = "themr"
+  var source: List<String> = listOf("themr")
   var combinations = emptyMap<String, List<String>>()
 }

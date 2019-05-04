@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    setTheme(themr(R.style.PaletteB, R.style.AppTheme))
+    setTheme(ThemR.get(R.style.PaletteB, R.style.AppTheme))
 
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
@@ -35,12 +35,6 @@ class MainActivity : AppCompatActivity() {
     view.setTextColor(color)
     view.addLeftSquare(color)
   }
-}
-
-private fun Activity.themr(paletteId: Int, themeId: Int): Int {
-  val paletteStyle = this.resources.getResourceName(paletteId).split("/")[1]
-  val themeStyle = this.resources.getResourceName(themeId).split("/")[1]
-  return this.resources.getIdentifier(paletteStyle + "_" + themeStyle, "style", this.packageName)
 }
 
 @Attr

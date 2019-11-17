@@ -12,6 +12,9 @@ import java.io.File
 import java.lang.IllegalStateException
 import javax.xml.parsers.DocumentBuilderFactory
 
+private const val SOURCE_GENERATED_OUTPUT_DIR = "build/generated/source/themr"
+private const val RES_GENERATED_OUTPUT_DIR = "build/generated/res/themr"
+
 class ThemrPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     val extension = project.extensions.create("themr", ThemrPluginExtension::class.java)
@@ -25,6 +28,11 @@ class ThemrPlugin : Plugin<Project> {
     }
 
     project.task("themrGenerateThemes") {
+      it.outputs.dirs(project.file(SOURCE_GENERATED_OUTPUT_DIR), project.file(RES_GENERATED_OUTPUT_DIR))
+      it.inputs.files(extension.source.map { fileName ->
+        project.file("src/main/res/values/$fileName.xml")
+      })
+
       it.doLast {
         val styles = parseResourceStyles(extension, project)
         val themrStyles = createThemeCombinations(styles, extension.combinations)
@@ -40,18 +48,18 @@ class ThemrPlugin : Plugin<Project> {
 
   private fun registerGeneratedSources(sourceSets: NamedDomainObjectContainer<AndroidSourceSet>, project: Project) {
     val main = sourceSets.getByName("main")
-    main.res.srcDirs(project.file("build/generated/res/themr"))
-    main.java.srcDirs(project.file("build/generated/source/themr"))
+    main.res.srcDirs(project.file(RES_GENERATED_OUTPUT_DIR))
+    main.java.srcDirs(project.file(SOURCE_GENERATED_OUTPUT_DIR))
   }
 
   private fun writeGeneratedStyles(project: Project, stylesFileContents: String) {
-    val directory = project.file("build/generated/res/themr/values")
+    val directory = project.file("${RES_GENERATED_OUTPUT_DIR}/values")
     if (!directory.exists()) directory.mkdirs()
     File(directory, "gen-themr.xml").writeText(stylesFileContents)
   }
 
   private fun writeGeneratedSource(project: Project, javaFile: JavaFile) {
-    val directory = project.file("build/generated/source/themr")
+    val directory = project.file(SOURCE_GENERATED_OUTPUT_DIR)
     if (!directory.exists()) directory.mkdirs()
     javaFile.writeTo(directory)
   }

@@ -4,12 +4,16 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.AndroidSourceSet
 import com.squareup.javapoet.*
+import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.w3c.dom.Element
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.tasks.*
 import java.io.File
 import java.lang.IllegalStateException
+import javax.inject.Inject
 import javax.xml.parsers.DocumentBuilderFactory
 
 private const val SOURCE_GENERATED_OUTPUT_DIR = "build/generated/source/themr"
@@ -27,29 +31,63 @@ class ThemrPlugin : Plugin<Project> {
       plugin.extension.sourceSets { registerGeneratedSources(it, project) }
     }
 
-    project.task("themrGenerateThemes") {
-      it.outputs.dirs(project.file(SOURCE_GENERATED_OUTPUT_DIR), project.file(RES_GENERATED_OUTPUT_DIR))
-      it.inputs.files(extension.source.map { fileName ->
-        project.file("src/main/res/values/$fileName.xml")
-      })
-
-      it.doLast {
-        val styles = parseResourceStyles(extension, project)
-        val themrStyles = createThemeCombinations(styles, extension.combinations)
-
-        writeGeneratedStyles(project, createOutputStyles(themrStyles))
-        writeGeneratedSource(project, createThemR(readPackageName(project), themrStyles))
-      }
+    project.tasks.register("themrGenerateThemes", GenerateTask::class.java) { instance ->
+      instance.source = extension.source
+      instance.combinations = extension.combinations
     }
-    project.afterEvaluate {
-      project.tasks.getByName("preBuild").dependsOn("themrGenerateThemes")
-    }
+
+    project.afterEvaluate { project.tasks.getByName("preBuild").dependsOn("themrGenerateThemes") }
   }
 
   private fun registerGeneratedSources(sourceSets: NamedDomainObjectContainer<AndroidSourceSet>, project: Project) {
     val main = sourceSets.getByName("main")
     main.res.srcDirs(project.file(RES_GENERATED_OUTPUT_DIR))
     main.java.srcDirs(project.file(SOURCE_GENERATED_OUTPUT_DIR))
+  }
+}
+
+internal data class ThemrStyle(val style: Style, val palette: String, val theme: String)
+
+open class ThemrPluginExtension {
+  var source: List<String> = listOf("themr")
+  var combinations = emptyMap<String, List<String>>()
+}
+
+@CacheableTask
+open class GenerateTask @Inject constructor(
+    objects: ObjectFactory,
+    private val projectLayout: ProjectLayout
+) : DefaultTask() {
+
+  lateinit var source: List<String>
+  lateinit var combinations: Map<String, List<String>>
+
+  @InputFiles
+  val paletteFiles = objects.fileCollection()
+
+  @OutputDirectory
+  val generatedSourceOutput = objects.directoryProperty()
+
+  @OutputDirectory
+  val generatedResOutput = objects.directoryProperty()
+
+  init {
+    generatedSourceOutput.set(projectLayout.projectDirectory.dir(SOURCE_GENERATED_OUTPUT_DIR))
+    generatedResOutput.set(projectLayout.projectDirectory.dir(RES_GENERATED_OUTPUT_DIR))
+  }
+
+  private val packageName = readPackageName(project)
+
+  @TaskAction
+  fun generate() {
+    paletteFiles.setFrom(source.map { fileName ->
+      projectLayout.projectDirectory.file("src/main/res/values/$fileName.xml")
+    })
+    val styles = parseResourceStyles(source, projectLayout)
+    val themrStyles = createThemeCombinations(styles, combinations)
+
+    writeGeneratedStyles(project, createOutputStyles(themrStyles))
+    writeGeneratedSource(project, createThemR(packageName, themrStyles))
   }
 
   private fun writeGeneratedStyles(project: Project, stylesFileContents: String) {
@@ -98,11 +136,5 @@ class ThemrPlugin : Plugin<Project> {
       null
     }
   }
-}
 
-internal data class ThemrStyle(val style: Style, val palette: String, val theme: String)
-
-open class ThemrPluginExtension {
-  var source: List<String> = listOf("themr")
-  var combinations = emptyMap<String, List<String>>()
 }

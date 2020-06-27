@@ -1,12 +1,12 @@
 package com.github.ouchadam.themr
 
-import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.FileCollection
 import org.w3c.dom.Element
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-internal fun parseResourceStyles(source: List<String>, project: ProjectLayout) = source.map { fileName ->
-  readThemeStyles(project.projectDirectory.file("src/main/res/values/$fileName.xml").asFile)
+internal fun parseResourceStyles(source: FileCollection) = source.map { file ->
+  readThemeStyles(file)
 }.foldRight(mutableMapOf<String, Style>()) { current, acc ->
   acc.putAll(current); acc
 }

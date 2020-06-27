@@ -32,8 +32,10 @@ class ThemrPlugin : Plugin<Project> {
     }
 
     project.tasks.register("themrGenerateThemes", GenerateTask::class.java) { instance ->
-      instance.source = extension.source
-      instance.combinations = extension.combinations
+      instance.paletteFiles.setFrom(project.files(extension.source.map { fileName ->
+        "src/main/res/values/$fileName.xml"
+      }))
+      instance.combinations.set(extension.combinations)
     }
 
     project.afterEvaluate { project.tasks.getByName("preBuild").dependsOn("themrGenerateThemes") }
@@ -56,35 +58,27 @@ open class ThemrPluginExtension {
 @CacheableTask
 open class GenerateTask @Inject constructor(
     objects: ObjectFactory,
-    private val projectLayout: ProjectLayout
+    projectLayout: ProjectLayout
 ) : DefaultTask() {
 
-  lateinit var source: List<String>
-  lateinit var combinations: Map<String, List<String>>
+  @Input
+  val combinations = objects.mapProperty(String::class.java, List::class.java)
 
   @InputFiles
   val paletteFiles = objects.fileCollection()
 
   @OutputDirectory
-  val generatedSourceOutput = objects.directoryProperty()
+  val generatedSourceOutput = projectLayout.projectDirectory.dir(SOURCE_GENERATED_OUTPUT_DIR)
 
   @OutputDirectory
-  val generatedResOutput = objects.directoryProperty()
-
-  init {
-    generatedSourceOutput.set(projectLayout.projectDirectory.dir(SOURCE_GENERATED_OUTPUT_DIR))
-    generatedResOutput.set(projectLayout.projectDirectory.dir(RES_GENERATED_OUTPUT_DIR))
-  }
+  val generatedResOutput = projectLayout.projectDirectory.dir(RES_GENERATED_OUTPUT_DIR)
 
   private val packageName = readPackageName(project)
 
   @TaskAction
   fun generate() {
-    paletteFiles.setFrom(source.map { fileName ->
-      projectLayout.projectDirectory.file("src/main/res/values/$fileName.xml")
-    })
-    val styles = parseResourceStyles(source, projectLayout)
-    val themrStyles = createThemeCombinations(styles, combinations)
+    val styles = parseResourceStyles(paletteFiles)
+    val themrStyles = createThemeCombinations(styles, combinations.get() as Map<String, List<String>>)
 
     writeGeneratedStyles(project, createOutputStyles(themrStyles))
     writeGeneratedSource(project, createThemR(packageName, themrStyles))

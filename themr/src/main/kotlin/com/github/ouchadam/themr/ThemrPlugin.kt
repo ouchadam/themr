@@ -103,18 +103,18 @@ open class GenerateTask @Inject constructor(
         val styles = parseResourceStyles(paletteFiles)
         val themrStyles = createThemeCombinations(styles, combinations.get() as Map<String, List<String>>)
 
-        writeGeneratedStyles(project, createOutputStyles(themrStyles))
-        writeGeneratedSource(project, createThemR(packageName.get(), themrStyles))
+        writeGeneratedStyles(createOutputStyles(themrStyles))
+        writeGeneratedSource(createThemR(packageName.get(), themrStyles))
     }
 
-    private fun writeGeneratedStyles(project: Project, stylesFileContents: String) {
-        val directory = project.file("${RES_GENERATED_OUTPUT_DIR}/values")
+    private fun writeGeneratedStyles(stylesFileContents: String) {
+        val directory = generatedResOutput.dir("values").asFile
         if (!directory.exists()) directory.mkdirs()
         File(directory, "gen-themr.xml").writeText(stylesFileContents)
     }
 
-    private fun writeGeneratedSource(project: Project, javaFile: JavaFile) {
-        val directory = project.file(SOURCE_GENERATED_OUTPUT_DIR)
+    private fun writeGeneratedSource(javaFile: JavaFile) {
+        val directory = generatedSourceOutput.asFile
         if (!directory.exists()) directory.mkdirs()
         javaFile.writeTo(directory)
     }

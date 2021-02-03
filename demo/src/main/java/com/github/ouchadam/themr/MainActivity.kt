@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import com.github.ouchadam.attr.Attr
-import com.github.ouchadam.attr.attr
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -19,8 +18,8 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    val attributes = theme.attr<ThemeAttributes>()
-    bind(attributes)
+//    val attributes = theme.attr<ThemeAttributes>()
+//    bind(attributes)
   }
 
   private fun bind(attributes: ThemeAttributes) {
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
   }
 }
 
-@Attr
+//@Attr
 data class ThemeAttributes(
     @Attr.Id(R.attr.colorPrimary) @ColorInt val colorPrimary: Int,
     @Attr.Id(R.attr.colorAccent) @ColorInt val colorAccent: Int,

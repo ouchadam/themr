@@ -34,7 +34,7 @@ jobs:
     - checkout
     - run:
         name: Publish
-        command: ./gradlew clean themr:build bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+        command: ./gradlew clean themr:build
 
 workflows:
   version: 2

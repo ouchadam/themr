@@ -1,6 +1,7 @@
 package com.github.ouchadam.themr
 
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.AndroidSourceSet
 import com.squareup.javapoet.JavaFile
@@ -11,9 +12,13 @@ import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.CompileClasspath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity.*
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
@@ -27,13 +32,7 @@ class ThemrPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create("themr", ThemrPluginExtension::class.java)
 
-        project.plugins.withType(AppPlugin::class.java) { plugin ->
-            plugin.extension.sourceSets { registerGeneratedSources(it, project) }
-        }
-
-        project.plugins.withType(LibraryPlugin::class.java) { plugin ->
-            plugin.extension.sourceSets { registerGeneratedSources(it, project) }
-        }
+        (project.extensions.getByName("android") as BaseExtension).sourceSets { registerGeneratedSources(it, project) }
 
         project.tasks.register("themrGenerateThemes", GenerateTask::class.java) { instance ->
             instance.paletteFiles.setFrom(project.files(extension.source.map { fileName ->
@@ -53,7 +52,7 @@ class ThemrPlugin : Plugin<Project> {
     }
 
     private fun readPackageName(project: Project): String {
-        return project.plugins.findPlugin(AppPlugin::class.java)?.extension?.defaultConfig?.applicationId
+        return (project.extensions.getByName("android") as BaseExtension?)?.defaultConfig?.applicationId
             ?: findPackageNameFromManifest(project)
             ?: throw IllegalStateException("The project doesn't apply an android plugin!")
     }
@@ -87,6 +86,7 @@ open class GenerateTask @Inject constructor(
     @Input
     val combinations = objects.mapProperty(String::class.java, List::class.java)
 
+    @PathSensitive(NAME_ONLY)
     @InputFiles
     val paletteFiles = objects.fileCollection()
 

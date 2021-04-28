@@ -1,23 +1,41 @@
-apply plugin: 'kotlin'
-apply plugin: 'com.novoda.bintray-release'
-
-repositories {
-  google()
-  jcenter()
+plugins {
+    id 'kotlin'
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.14.0'
 }
 
 dependencies {
   implementation gradleApi()
   implementation "com.android.tools.build:gradle:4.1.1"
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-  implementation 'com.squareup:javapoet:1.11.1'
+  implementation 'com.squareup:javapoet:1.13.0'
 }
 
-publish {
-  userOrg = 'ouchadam'
-  groupId = 'com.github.ouchadam'
-  artifactId = 'themr'
-  publishVersion = "$System.env.CIRCLE_BUILD_NUM"
-  desc = 'Theme concatenation via gradle plugin'
-  website = 'https://github.com/ouchadam/themr'
+group = 'com.github.ouchadam'
+version = "1.0.0"
+
+publishing {
+    repositories {
+        maven {
+            name = 'localPluginRepository'
+            url = '../local-plugin-repository'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/ouchadam/themr/'
+    vcsUrl = 'https://github.com/ouchadam/themr.git'
+    tags = ['theme', 'android']
+}
+
+gradlePlugin {
+    plugins {
+        themrPlugin {
+            id = 'com.github.ouchadam.themr'
+            displayName = 'themr'
+            description = 'Theme concatenation via gradle plugin'
+            implementationClass = 'com.github.ouchadam.themr.ThemrPlugin'
+        }
+    }
 }

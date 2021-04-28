@@ -1,1 +1,2 @@
-include ':demo', ':themr'
+//include ':demo'
+include ':themr'

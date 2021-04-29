@@ -51,7 +51,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 ### What is this?
 
-A gradle plugin to generate combinations of themes based on a color palette. This is done by simplying inlining a palette style into a theme style.
+A gradle plugin to generate combinations of themes based on a color palette. This is done by simply inlining a palette style into a theme style.
 
 The example above will generate
 
@@ -70,7 +70,7 @@ The example above will generate
 ### Why is this useful?
 
 
-When an app uses mulitple themes 
+When an app uses mulitple XML themes...
 
 ```xml
 <style name="HomeTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -84,8 +84,7 @@ When an app uses mulitple themes
 </style>
 ```
 
-and different palettes are required such as a dark mode, management starts to get tricky, especially when more palettes are introduced. This can be achieved by copying all of the themes for each palette, rearchitecting the theme hierarchy or by programatically applying the colours. 
-
+and different palettes...
 
 ```xml
 <style name="HomeTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -99,12 +98,9 @@ and different palettes are required such as a dark mode, management starts to ge
 </style>
 ```
 
-```kotlin
-fun bindView(view) {
-  val themeWrapper = createThemeWrapperFor(Configuration.DARK_MODE) // find all the dark mode attributes
-  view.text.setTextColor(themeWrapper.colorPrimary)
-}
-```
+...management of all the combination starts to get tricky, especially when more palettes are introduced. 
+Usually this is handled by copying all of the themes for each palette, rearchitecting the theme hierarchy or by programatically applying the colours. 
+
 
 `themr` reduces the need for this boiler plate by allowing the palettes and themes to be decoupled and the combinations auto generated.
 

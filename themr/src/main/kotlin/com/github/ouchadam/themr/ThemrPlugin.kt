@@ -1,8 +1,6 @@
 package com.github.ouchadam.themr
 
-import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.AndroidSourceSet
 import com.squareup.javapoet.JavaFile
 import org.gradle.api.DefaultTask
@@ -12,8 +10,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Classpath
-import org.gradle.api.tasks.CompileClasspath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -96,6 +92,7 @@ open class GenerateTask @Inject constructor(
     @OutputDirectory
     val generatedResOutput = projectLayout.projectDirectory.dir(RES_GENERATED_OUTPUT_DIR)
 
+    @Input
     val packageName = objects.property(String::class.java)
 
     @TaskAction

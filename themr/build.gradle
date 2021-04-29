@@ -7,21 +7,18 @@ plugins {
 
 dependencies {
   implementation gradleApi()
-  implementation "com.android.tools.build:gradle:4.1.1"
+  implementation ("com.android.tools.build:gradle:4.1.1") {
+      exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib-jdk8"
+  }
   implementation 'com.squareup:javapoet:1.13.0'
+  implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 group = 'com.github.ouchadam'
-version = "1.0.0"
-
-publishing {
-    repositories {
-        maven {
-            name = 'localPluginRepository'
-            url = '../local-plugin-repository'
-        }
-    }
-}
+version = "1.0.1"
 
 pluginBundle {
     website = 'https://github.com/ouchadam/themr/'
